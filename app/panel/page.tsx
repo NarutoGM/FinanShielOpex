@@ -1,34 +1,56 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { FinancialData, ViewState, SimulationScenario, Project } from '@/types';
-import { ProjectListView } from '@/components/ProjectListView';
-import { ProjectDetailsView } from '@/components/ProjectDetailsView';
-import { ScenarioEditor } from '@/components/ScenarioEditor';
-import { INITIAL_TEMPLATE, MOCK_PROJECTS, MOCK_SCENARIOS } from '@/data/mockData';
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { FinancialData, ViewState, SimulationScenario, Project } from "@/types";
+import { ProjectListView } from "@/components/ProjectListView";
+import { ProjectDetailsView } from "@/components/ProjectDetailsView";
+import { ScenarioEditor } from "@/components/ScenarioEditor";
+import ConceptosGenerales from "@/components/ConceptosGenerales";
+import {
+  INITIAL_TEMPLATE,
+  MOCK_PROJECTS,
+  MOCK_SCENARIOS,
+} from "@/data/mockData";
 
 function App() {
+  const searchParams = useSearchParams();
+  const viewParam = searchParams.get("view");
+
   // Navigation State
   const [view, setView] = useState<ViewState>(ViewState.PROJECT_LIST);
+  const [showConceptos, setShowConceptos] = useState(false);
+
+  useEffect(() => {
+    if (viewParam === "conceptos") {
+      setShowConceptos(true);
+      setView(ViewState.PROJECT_LIST);
+    } else {
+      setShowConceptos(false);
+    }
+  }, [viewParam]);
 
   // Data State
   const [projects, setProjects] = useState<Project[]>(MOCK_PROJECTS);
-  const [scenarios, setScenarios] = useState<SimulationScenario[]>(MOCK_SCENARIOS);
+  const [scenarios, setScenarios] =
+    useState<SimulationScenario[]>(MOCK_SCENARIOS);
 
   // Context State
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [activeScenarioId, setActiveScenarioId] = useState<string | null>(null);
 
   // --- Helpers ---
-  const activeProject = projects.find(p => p.id === activeProjectId);
-  const activeScenario = scenarios.find(s => s.id === activeScenarioId);
-  const filteredScenarios = scenarios.filter(s => s.projectId === activeProjectId);
+  const activeProject = projects.find((p) => p.id === activeProjectId);
+  const activeScenario = scenarios.find((s) => s.id === activeScenarioId);
+  const filteredScenarios = scenarios.filter(
+    (s) => s.projectId === activeProjectId
+  );
 
   // --- Project CRUD ---
   const handleProjectUpdate = (field: keyof Project, value: string) => {
     if (!activeProjectId) return;
-    setProjects(prev =>
-      prev.map(p =>
+    setProjects((prev) =>
+      prev.map((p) =>
         p.id === activeProjectId
           ? { ...p, [field]: value, lastModified: Date.now() }
           : p
@@ -40,9 +62,9 @@ function App() {
     const newId = `p${Date.now()}`;
     const newProject: Project = {
       id: newId,
-      name: 'Nuevo Negocio',
-      description: 'Describe de qué trata este proyecto...',
-      category: 'General',
+      name: "Nuevo Negocio",
+      description: "Describe de qué trata este proyecto...",
+      category: "General",
       lastModified: Date.now(),
     };
     setProjects([newProject, ...projects]);
@@ -52,9 +74,13 @@ function App() {
 
   const deleteProject = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    if (window.confirm('¿Estás seguro de eliminar el proyecto entero y todas sus estimaciones?')) {
-      setProjects(prev => prev.filter(p => p.id !== id));
-      setScenarios(prev => prev.filter(s => s.projectId !== id));
+    if (
+      window.confirm(
+        "¿Estás seguro de eliminar el proyecto entero y todas sus estimaciones?"
+      )
+    ) {
+      setProjects((prev) => prev.filter((p) => p.id !== id));
+      setScenarios((prev) => prev.filter((s) => s.projectId !== id));
     }
   };
 
@@ -69,10 +95,12 @@ function App() {
     const newScenario: SimulationScenario = {
       id: newId,
       projectId: activeProjectId,
-      name: hasBase ? `Estimación #${filteredScenarios.length + 1}` : 'Escenario Base',
+      name: hasBase
+        ? `Estimación #${filteredScenarios.length + 1}`
+        : "Escenario Base",
       description: hasBase
-        ? 'Variación basada en la situación actual.'
-        : 'Punto de partida inicial.',
+        ? "Variación basada en la situación actual."
+        : "Punto de partida inicial.",
       lastModified: Date.now(),
       data: { ...baseData },
     };
@@ -87,24 +115,28 @@ function App() {
     setView(ViewState.SCENARIO_EDITOR);
   };
 
-  const saveScenario = (name: string, description: string, data: FinancialData) => {
+  const saveScenario = (
+    name: string,
+    description: string,
+    data: FinancialData
+  ) => {
     if (!activeScenarioId) return;
 
-    setScenarios(prev =>
-      prev.map(s =>
+    setScenarios((prev) =>
+      prev.map((s) =>
         s.id === activeScenarioId
           ? { ...s, name, description, data, lastModified: Date.now() }
           : s
       )
     );
 
-    alert('Simulación guardada correctamente');
+    alert("Simulación guardada correctamente");
   };
 
   const deleteScenario = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    if (window.confirm('¿Eliminar esta estimación permanentemente?')) {
-      setScenarios(prev => prev.filter(s => s.id !== id));
+    if (window.confirm("¿Eliminar esta estimación permanentemente?")) {
+      setScenarios((prev) => prev.filter((s) => s.id !== id));
     }
   };
 
@@ -112,18 +144,20 @@ function App() {
   return (
     <div className="flex min-h-screen ">
       <main className="flex-1 p-8 overflow-y-auto">
-        {view === ViewState.PROJECT_LIST && (
+        {showConceptos ? (
+          <ConceptosGenerales />
+        ) : view === ViewState.PROJECT_LIST ? (
           <ProjectListView
             projects={projects}
             scenarios={scenarios}
-            onSelectProject={id => {
+            onSelectProject={(id) => {
               setActiveProjectId(id);
               setView(ViewState.PROJECT_DETAILS);
             }}
             onCreateProject={createNewProject}
             onDeleteProject={deleteProject}
           />
-        )}
+        ) : null}
 
         {view === ViewState.PROJECT_DETAILS && activeProject && (
           <ProjectDetailsView
