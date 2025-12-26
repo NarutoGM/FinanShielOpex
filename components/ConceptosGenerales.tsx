@@ -271,7 +271,7 @@ export default function ConceptosGenerales() {
           Análisis del Punto de Equilibrio y Riesgo Operativo
         </h1>
         <p className="text-slate-600">
-          Bienvenido/a Jean Marko Flores, analiza la rentabilidad de tu empresa
+          Bienvenido/a, analiza la rentabilidad de tu empresa
         </p>
       </div>
 
