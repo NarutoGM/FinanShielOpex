@@ -662,8 +662,7 @@ export default function Home() {
             Análisis del Punto de Equilibrio y Riesgo Operativo
           </h1>
           <p className="text-gray-600">
-            Bienvenido/a {currentUser?.nombre}, analiza la rentabilidad de tu
-            empresa
+            Bienvenido/a, analiza la rentabilidad de tu empresa
           </p>
         </div>
 
