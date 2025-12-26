@@ -284,7 +284,7 @@ const Login = () => {
                 )}
               </button>
 
-              {/* Botón Crear Usuario */}
+              {/* Botón Crear Usuario
               <button
                 type="button"
                 onClick={() => setIsRegisterMode(true)}
@@ -295,7 +295,7 @@ const Login = () => {
                   size={18}
                   className="ml-2 opacity-70 group-hover:translate-x-1 transition-transform"
                 />
-              </button>
+              </button> */}
             </form>
           ) : (
             <form onSubmit={handleRegister} className="space-y-4">
