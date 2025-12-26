@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { FinancialData, ViewState, SimulationScenario, Project } from "@/types";
 import { ProjectListView } from "@/components/ProjectListView";
@@ -13,7 +13,7 @@ import {
   MOCK_SCENARIOS,
 } from "@/data/mockData";
 
-function App() {
+function PanelContent() {
   const searchParams = useSearchParams();
   const viewParam = searchParams.get("view");
 
@@ -186,4 +186,16 @@ function App() {
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#A3E635]"></div>
+        </div>
+      }
+    >
+      <PanelContent />
+    </Suspense>
+  );
+}
